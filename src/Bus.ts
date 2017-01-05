@@ -1,95 +1,76 @@
-import {IBus} from "./IBus";
-import {IBusTicket} from "./IBusTicket";
-import * as async from "async";
-import * as _ from "lodash";
-import 'bluebird';
+import {IBus} from './IBus';
+import {IBusTicket} from './IBusTicket';
+import {IBusResponse} from './IBusResponse';
 
 export class Bus implements IBus {
-    tickets: IBusTicket[];
+    private tickets: IBusTicket[] = [];
 
-    constructor() {
-        this.tickets = [];
-    }
-
-    getTicket(name: string): IBusTicket {
-        let ticket = this.tickets.find((x: IBusTicket) => x.name === name);
-
-        if (_.isUndefined(ticket)) {
-            return null;
+    public getTicket(name: string): IBusTicket {
+        for (const ticket of this.tickets) {
+            if (ticket.name === name) {
+                return ticket;
+            }
         }
 
-        return ticket;
+        return null;
     }
 
-    addTicket(name: string, fn): void {
-        if (this.getTicket(name)) {
+    public addTicket(name: string, fn: any): void {
+        if (this.isTicketExists(name)) {
             this.removeTicket(name);
         }
 
-        this.tickets.push({
-            name: name,
-            fn: fn,
-            success: null,
-            error: null
-        });
+        this.tickets.push({ name: name, fn: fn });
     }
 
-    removeTicket(name: string): void {
+    public removeTicket(name: string): void {
+        let ticketToRemove = this.getTicket(name);
+
         this.tickets = this.tickets.filter((ticket: IBusTicket) => {
-           if (ticket.name !== name) {
-               return ticket;
-           }
+            return ticket !== ticketToRemove;
         });
     }
 
-    getTickets(): IBusTicket[] {
-        return this.tickets;
-    }
+    public async send(): Promise<IBusResponse[]> {
+        const responses: IBusResponse[] = [];
 
-    getTicketResponses(): IBusTicket[] {
-        let responses: IBusTicket[] = [];
-        let tickets = this.getTickets();
+        for (const ticket of this.tickets) {
+            try {
+                responses.push({
+                    name: ticket.name,
+                    success: await ticket.fn()
+                });
+            } catch (e) {
+                responses.push({
+                    name: ticket.name,
+                    error: e
+                });
+            }
+        }
 
-        tickets.map((ticket: IBusTicket) => {
-            responses.push({
-                name: ticket.name,
-                fn: null,
-                success: ticket.success,
-                error: ticket.error
-            });
-        });
-
+        this.clear();
         return responses;
     }
 
-    getTicketsLength(): number {
+    public getTicketsLength(): number {
         return this.getTickets().length;
     }
 
-    send() {
-        return new Promise((resolve) => {
-            async.each(this.tickets, (relay, callback) => {
-                relay.fn()
-                    .then((success) => {
-                        relay.success = success;
-                        callback();
-                    })
-                    .catch((error) => {
-                        relay.error = error;
-                        callback();
-                    });
-
-            }, () => {
-                resolve();
-            })
-        }).then(() => {
-            let ticketResponses = this.getTicketResponses();
-            this.tickets = [];
-            return ticketResponses;
-        });
+    private getTickets(): IBusTicket[] {
+        return this.tickets;
     }
 
-    clear(): void {
+    public clear(): void {
         this.tickets = [];
+    }
+
+    private isTicketExists(name: string): boolean {
+        const ticket = this.getTicket(name);
+
+        if (ticket) {
+            return true;
+        }
+
+        return false;
     }
 }

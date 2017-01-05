@@ -1,7 +1,6 @@
 
-export interface IBusTicket {
+export interface IBusResponse {
     name: string;
-    fn: any;
     success?: any;
     error?: any;
 }
