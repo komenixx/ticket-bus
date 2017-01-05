@@ -1,0 +1,30 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "rootDir": "src/",
+    "outDir": "dist",
+    "sourceMap": true,
+    "target": "es5",
+    "module": "amd",
+    "declaration": false,
+    "noImplicitAny": false,
+    "removeComments": true,
+    "noLib": false,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "moduleResolution": "node",
+    "lib": ["es2015", "dom"],
+    "allowSyntheticDefaultImports": true
+  },
+  "filesGlob": [
+    "./src/**/*.ts",
+    "./test/**/*.ts",
+    "./node_modules/**/*.d.ts"
+  ],
+  "exclude": [
+    "dist"
+  ],
+  "atom": {
+    "rewriteTsconfig": false
+  }
+}
