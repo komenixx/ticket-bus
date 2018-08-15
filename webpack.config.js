@@ -6,13 +6,14 @@ module.exports = {
     entry: path.join(__dirname, '/src/Bus.ts'),
     output: {
         filename: 'index.js',
-        path: __dirname + '/dist'
+        path: __dirname + '/dist',
+        libraryTarget: 'commonjs-module'
     },
     module: {
         rules: [
             {
                 test: /\.tsx?$/,
-                loader: 'ts-loader',
+                loader: 'babel-loader?presets[]=env!ts-loader',
                 exclude: /node_modules/,
             },
         ]

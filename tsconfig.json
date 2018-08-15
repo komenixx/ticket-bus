@@ -1,18 +1,8 @@
 {
   "compilerOptions": {
-    "sourceMap": true,
-    "target": "es5",
+    "target": "es2016",
     "module": "commonjs",
-    "removeComments": true,
-    "allowJs": true,
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
-    "moduleResolution": "node",
-    "strictNullChecks": false,
     "lib": ["es2016", "dom"]
-  },
-  "awesomeTypescriptLoaderOptions": {
-    "forkChecker": true
   },
   "exclude": [
     "node_modules",
