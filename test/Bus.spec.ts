@@ -1,8 +1,6 @@
+/// <reference path="../node_modules/@types/jasmine/index.d.ts" />
 import {IBus} from '../src/IBus';
 import {Bus} from '../src/Bus';
-import {IBusTicket} from '../src/IBusTicket';
-
-declare const sinon;
 
 describe('Bus', () => {
     let bus: IBus;
@@ -11,87 +9,98 @@ describe('Bus', () => {
         bus = new Bus();
     });
 
-    it('get ticket', () => {
-        let ticket: IBusTicket = bus.getTicket('name');
+    it('add relay', () => {
+        let relays = [];
+        bus.addRelay('name', 'fn1');
 
-        expect(ticket).toBeNull();
+        relays = bus.getRelays();
 
-        bus.addTicket('name', () => {});
+        expect(relays.length).toBe(1);
+        expect(relays[0]).toBeDefined();
+        expect(relays[0].name).toBe('name');
+        expect(relays[0].fn).toBe('fn1');
 
-        ticket = bus.getTicket('name');
+        bus.addRelay('name2', 'fn2');
 
-        expect(ticket).not.toBeNull();
-        expect(ticket.name).toBe('name');
+        relays = bus.getRelays();
 
-        ticket = bus.getTicket('notExistingName');
+        expect(relays.length).toBe(2);
 
-        expect(ticket).toBeNull();
+        bus.addRelay('name2', 'fn2');
+
+        relays = bus.getRelays();
+
+        expect(relays.length).toBe(2);
+
+        expect(relays[1]).toBeDefined();
+        expect(relays[1].name).toBe('name2');
+        expect(relays[1].fn).toBe('fn2');
     });
 
-    it('add ticket', () => {
-        bus.addTicket('name', 'fn1');
-        let addedTicket = bus.getTicket('name');
+    it('remove relay', () => {
+        bus.removeRelay('name');
 
-        expect(addedTicket).toBeDefined();
-        expect(addedTicket.name).toBe('name');
-        expect(addedTicket.fn).toBe('fn1');
+        expect(bus.getRelaysLength()).toBe(0);
 
-        bus.addTicket('name', 'fn2');
-        addedTicket = bus.getTicket('name');
+        bus.addRelay('name', () => {});
+        bus.removeRelay('name');
 
-        expect(addedTicket).toBeDefined();
-        expect(addedTicket.name).toBe('name');
-        expect(addedTicket.fn).toBe('fn2');
+        expect(bus.getRelaysLength()).toBe(0);
+
+        bus.addRelay('1', () => {});
+        bus.addRelay('2', () => {});
+
+        bus.removeRelay('1');
+
+        expect(bus.getRelaysLength()).toBe(1);
+
+        bus.removeRelay('2');
+
+        expect(bus.getRelaysLength()).toBe(0);
     });
 
-    it('remove ticket', () => {
-        bus.removeTicket('name');
-
-        expect(bus.getTicketsLength()).toBe(0);
-
-        bus.addTicket('name', () => {});
-
-        bus.removeTicket('name');
-
-        expect(bus.getTicketsLength()).toBe(0);
-
-        bus.addTicket('1', () => {});
-        bus.addTicket('2', () => {});
-
-        bus.removeTicket('1');
-
-        expect(bus.getTicketsLength()).toBe(1);
-
-        bus.removeTicket('2');
-
-        expect(bus.getTicketsLength()).toBe(0);
-    });
-
-    it('send', async(done) => {
+    it('send', async() => {
         const nameChanged = async() => 201;
         const priorityChanged = async() => { throw 500; };
 
-        bus.addTicket('nameChanged', () => nameChanged());
-        bus.addTicket('priorityChanged', () => priorityChanged());
+        bus.addRelay('nameChanged', () => nameChanged());
+        bus.addRelay('priorityChanged', () => priorityChanged());
 
         const response = await bus.send();
 
+        console.log(response);
+
         expect(response[0].success).toBeDefined();
         expect(response[0].success).toBe(201);
-        expect(response[0].error).not.toBeDefined();
+        expect(response[0].error).toBe(null);
 
         expect(response[1].error).toBeDefined();
         expect(response[1].error).toBe(500);
-        expect(response[1].success).not.toBeDefined();
+        expect(response[1].success).toBe(null);
 
-        done();
+        return;
     });
 
-    it('get tickets length', () => {
-        expect(bus.getTicketsLength()).toBe(0);
-        bus.addTicket('name', () => {});
-        expect(bus.getTicketsLength()).toBe(1);
-        bus.removeTicket('name');
-        expect(bus.getTicketsLength()).toBe(0);
+    it('get relays', () => {
+        expect(bus.getRelays.length).toBe(0);
+        bus.addRelay('name', () => {});
+        expect(bus.getRelaysLength()).toBe(1);
+        bus.removeRelay('name');
+        expect(bus.getRelaysLength()).toBe(0);
+    });
+
+    it('get relays length', () => {
+        expect(bus.getRelaysLength()).toBe(0);
+        bus.addRelay('name', () => {});
+        expect(bus.getRelaysLength()).toBe(1);
+        bus.removeRelay('name');
+        expect(bus.getRelaysLength()).toBe(0);
+    });
+
+    it('clear', () => {
+        bus.addRelay('name', () => {});
+        expect(bus.getRelaysLength()).toBe(1);
+        bus.clear();
+        expect(bus.getRelaysLength()).toBe(0);
     });
 });

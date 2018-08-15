@@ -2,35 +2,43 @@
   "name": "ticketbus",
   "version": "1.0.0",
   "description": "Tool for sending async request with delay.",
-  "keywords": ["async", "ticket", "request", "bus"],
+  "keywords": [
+    "async",
+    "ticket",
+    "request",
+    "bus"
+  ],
   "homepage": "",
   "license": "MIT",
   "author": "Matěj Kamenec https://github.com/komenixx",
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "repository": {
     "type": "git",
     "url": "https://github.com/komenixx/ticketbus.git"
   },
   "scripts": {
-    "build": "./node_modules/webpack/bin/webpack.js",
+    "build": "./node_modules/webpack/bin/webpack.js --mode=production",
     "test": "./node_modules/karma/bin/karma start"
   },
   "devDependencies": {
     "@types/jasmine": "^2.5.53",
-    "awesome-typescript-loader": "^3.2.2",
+    "awesome-typescript-loader": "^5.2.0",
     "browser-sync": "^2.17.5",
-    "jasmine-core": "^2.5.2",
-    "karma": "^1.7.0",
+    "copy-webpack-plugin": "^4.5.2",
+    "jasmine-core": "^3.2.1",
+    "karma": "^3.0.0",
     "karma-chrome-launcher": "^2.0.0",
     "karma-jasmine": "^1.1.0",
     "karma-mocha-reporter": "^2.2.1",
     "karma-phantomjs-launcher": "^1.0.2",
     "karma-sinon": "^1.0.5",
     "karma-typescript": "^3.0.5",
-    "mocha": "^3.5.0",
-    "sinon": "^3.1.0",
-    "typescript": "^2.4.2",
-    "webpack": "^3.5.1",
-    "webpack-stream": "^4.0.0"
+    "mocha": "^5.2.0",
+    "sinon": "^6.1.5",
+    "ts-loader": "^4.4.2",
+    "typescript": "^3.0.1",
+    "webpack": "^4.16.5",
+    "webpack-cli": "^3.1.0"
   }
 }

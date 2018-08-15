@@ -1,76 +1,75 @@
-import {IBus} from './IBus';
-import {IBusTicket} from './IBusTicket';
-import {IBusResponse} from './IBusResponse';
+import {IBus, IBusRelay, IRelayResponse} from './IBus';
 
 export class Bus implements IBus {
-    private tickets: IBusTicket[] = [];
+    relays: IBusRelay[];
 
-    public getTicket(name: string): IBusTicket {
-        for (const ticket of this.tickets) {
-            if (ticket.name === name) {
-                return ticket;
-            }
-        }
-
-        return null;
+    constructor() {
+        this.relays = [];
     }
 
-    public addTicket(name: string, fn: any): void {
-        if (this.isTicketExists(name)) {
-            this.removeTicket(name);
+    public addRelay(name, fn): void {
+        if (this.isRelayExists(name)) {
+            this.removeRelay(name);
         }
 
-        this.tickets.push({ name: name, fn: fn });
-    }
-
-    public removeTicket(name: string): void {
-        let ticketToRemove = this.getTicket(name);
-
-        this.tickets = this.tickets.filter((ticket: IBusTicket) => {
-            return ticket !== ticketToRemove;
+        this.relays.push({
+            name: name,
+            fn: fn,
+            success: null,
+            error: null
         });
     }
 
-    public async send(): Promise<IBusResponse[]> {
-        const responses: IBusResponse[] = [];
+    public removeRelay(name: string): void {
+        const relay = this.getRelay(name);
 
-        for (const ticket of this.tickets) {
+        if (relay) {
+            this.relays = this.relays.filter(r => r !== relay);
+        }
+    }
+
+    public getRelays(): IBusRelay[] {
+        return this.relays;
+    }
+
+    public getRelaysLength(): number {
+        return this.getRelays().length;
+    }
+
+    public async send(): Promise<IRelayResponse[]> {
+        for (const relay of this.relays) {
             try {
-                responses.push({
-                    name: ticket.name,
-                    success: await ticket.fn()
-                });
-            } catch (e) {
-                responses.push({
-                    name: ticket.name,
-                    error: e
-                });
+                relay.success = await relay.fn();
+            } catch (error) {
+                relay.error = error;
             }
         }
 
-        this.clear();
-        return responses;
-    }
-
-    public getTicketsLength(): number {
-        return this.getTickets().length;
-    }
-
-    private getTickets(): IBusTicket[] {
-        return this.tickets;
+        const relayResponses = this.getRelayResponses();
+        this.relays = [];
+        return relayResponses;
     }
 
     public clear(): void {
-        this.tickets = [];
+        this.relays = [];
     }
 
-    private isTicketExists(name: string): boolean {
-        const ticket = this.getTicket(name);
+    private getRelayResponses(): IRelayResponse[] {
+        const relays = this.getRelays();
+        return relays.map(i => {
+            return {
+                name: i.name,
+                success: i.success,
+                error: i.error
+            }
+        });
+    }
 
-        if (ticket) {
-            return true;
-        }
+    private isRelayExists(name): boolean {
+        return !!this.relays.find(i => i.name === name);
+    }
 
-        return false;
+    private getRelay(name: string): IBusRelay {
+        return this.relays.find(r => r.name === name);
     }
 }
