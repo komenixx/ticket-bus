@@ -26,6 +26,7 @@
     "awesome-typescript-loader": "^5.2.0",
     "babel-core": "^6.26.3",
     "babel-loader": "^7.1.5",
+    "babel-preset-env": "^1.7.0",
     "browser-sync": "^2.17.5",
     "copy-webpack-plugin": "^4.5.2",
     "jasmine-core": "^3.2.1",
@@ -42,8 +43,5 @@
     "typescript": "^3.0.1",
     "webpack": "^4.16.5",
     "webpack-cli": "^3.1.0"
-  },
-  "dependencies": {
-    "babel-preset-env": "^1.7.0"
   }
 }
